@@ -33,7 +33,7 @@ local MATCH_MACRO_LABEL = "#define%s+([%w_]+)"
 local MATCH_MACRO_VALUE = "#define%s+[%w_]+[%s]*([%w_%*%\\%|]*)"
 
 local MATCH_TYPEDEF = "typedef%s*[%w_%*]+[%*%s]+[%w_%*%,%s]+;"
-local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w%\"%\'%(%)%|%\\%\n]+;"
+local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w_%(%)%|%s%\\]+;"
 local MATCH_ENUM = "typedef%s+enum%s+[%w_]*%s*%{[%w_%s%,]*%}%s*[%w_%, %*]+;"
 local MATCH_FUNC = "[%w_%*]+%s+[%w_]+%([%w_%*%,%s]*%);"
 local MATCH_STRUCT = "typedef%s+struct%s+[%w_]+%s*%{[%w_%*%;%s%{%}%[%]]+%}%s*[%w_%,%s%*]*;"
