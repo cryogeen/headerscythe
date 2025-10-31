@@ -75,8 +75,9 @@ end
 
 -- HeaderScythe Functions
 
----@type fun(content: string): {[1]: string, [2]: string, [3]: integer, [4]: integer}[]
+---@type fun(content: string): {token: integer, string: string, start: integer, line: integer}[]
 function HeaderScythe.scythe(content)
+    ---@type {token: integer, string: string, start: integer, line: integer}[]
     local tokens = {}
 
     -- pre process
@@ -98,7 +99,12 @@ function HeaderScythe.scythe(content)
         local macroName = define:match(MATCH_MACRO_LABEL) or ""
         local macroValue = define:match(MATCH_MACRO_VALUE) or ""
         table.insert(macros, {macroName, macroValue, macroStart})
-        table.insert(tokens, {TK_DEFINE, define, macroStart, macroLine})
+        table.insert(tokens, {
+            token = TK_DEFINE,
+            string = define,
+            start = macroStart,
+            line = macroLine
+        })
 
         if macroStart and macroEnd then
             preProcessedContent = preProcessedContent:sub(0, macroStart - 1) .. preProcessedContent:sub(macroEnd + 1)
@@ -116,48 +122,82 @@ function HeaderScythe.scythe(content)
     for typedef in preProcessedContent:gmatch(MATCH_TYPEDEF) do
         local start = preProcessedContent:find(typedef, 0, true)
         local line = findLineFromString(content, typedef)
-        table.insert(tokens, {TK_TYPEDEF, typedef, start, line})
+        table.insert(tokens, {
+            token = TK_TYPEDEF,
+            string = typedef,
+            start = start,
+            line = line
+        })
     end
 
     for const in preProcessedContent:gmatch(MATCH_CONST) do
         local start = preProcessedContent:find(const, 0, true)
         local line = findLineFromString(content, const)
-        table.insert(tokens, {TK_CONST, const, start, line})
+        table.insert(tokens, {
+            token = TK_CONST,
+            string = const,
+            start = start,
+            line = line
+        })
     end
 
     for enum in preProcessedContent:gmatch(MATCH_ENUM) do
         local start = preProcessedContent:find(enum, 0, true)
         local line = findLineFromString(content, enum)
-        table.insert(tokens, {TK_ENUM, enum, start, line})
+        table.insert(tokens, {
+            token = TK_ENUM,
+            string = enum,
+            start = start,
+            line = line
+        })
     end
 
     for func in preProcessedContent:gmatch(MATCH_FUNC) do
         local start = preProcessedContent:find(func, 0, true)
         local line = findLineFromString(content, func)
-        table.insert(tokens, {TK_FUNC, func, start, line})
+        table.insert(tokens, {
+            token = TK_FUNC,
+            string = func,
+            start = start,
+            line = line
+        })
     end
 
     for struct in preProcessedContent:gmatch(MATCH_STRUCT) do
         local start = preProcessedContent:find(struct, 0, true)
         local line = findLineFromString(content, struct)
-        table.insert(tokens, {TK_STRUCT, struct, start, line})
+        table.insert(tokens, {
+            token = TK_STRUCT,
+            string = struct,
+            start = start,
+            line = line
+        })
     end
 
     for union in preProcessedContent:gmatch(MATCH_UNION) do
         local start = preProcessedContent:find(union, 0, true)
         local line = findLineFromString(content, union)
-        table.insert(tokens, {TK_STRUCT, union, start, line})
+        table.insert(tokens, {
+            token = TK_STRUCT,
+            string = union,
+            start = start,
+            line = line
+        })
     end
 
     for include in preProcessedContent:gmatch(MATCH_INCLUDE) do
         local start = preProcessedContent:find(include, 0, true)
         local line = findLineFromString(content, include)
-        table.insert(tokens, {TK_INCLUDE, include, start, line})
+        table.insert(tokens, {
+            token = TK_INCLUDE,
+            string = include,
+            start = start,
+            line = line
+        })
     end
 
-
     table.sort(tokens, function(a, b)
-        return a[3] < b[3]
+        return a.start < b.start
     end)
 
     return tokens
