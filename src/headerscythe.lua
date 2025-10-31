@@ -24,8 +24,8 @@ local HeaderScythe = {}
 
 -- Constants
 
-local MATCH_COMMENT = "//[%/ %w_%;%*%:%.%,%=%+%-%(%)%[%]%{%}]*"
-local MATCH_COMMENT_MULTILINE = "/%*[%/%s%w_%;%*%:%.%,%=%+%-%(%)%[%]%{%}]*%*/"
+local MATCH_COMMENT = "//[\32-\255]*"
+local MATCH_COMMENT_MULTILINE = "/%*[\32-\255]*%*/"
 
 local MATCH_INCLUDE = "#include%s+[%<%\"%\'][^%<%>%\"%\']+[%>%\"%\']"
 local MATCH_DEFINE = "#define%s+[%w_]+[%s]*[%w_%*%\\%|]*"
