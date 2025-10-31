@@ -94,21 +94,19 @@ function HeaderScythe.scythe(content)
     local macros = {}
 
     for define in preProcessedContent:gmatch(MATCH_DEFINE) do
-        local macroStart, macroEnd = preProcessedContent:find(define, 0, true)
-        local macroLine = findLineFromString(content, define)
-        local macroName = define:match(MATCH_MACRO_LABEL) or ""
-        local macroValue = define:match(MATCH_MACRO_VALUE) or ""
-        table.insert(macros, {macroName, macroValue, macroStart})
+        local start = preProcessedContent:find(define, 0, true)
+        local line = findLineFromString(preProcessedContent, define)
+        local name = define:match(MATCH_MACRO_LABEL) or ""
+        local value = define:match(MATCH_MACRO_VALUE) or ""
+        table.insert(macros, {name, value, start})
         table.insert(tokens, {
             token = TK_DEFINE,
             string = define,
-            start = macroStart,
-            line = macroLine
+            start = start,
+            line = line
         })
 
-        if macroStart and macroEnd then
-            preProcessedContent = preProcessedContent:sub(0, macroStart - 1) .. preProcessedContent:sub(macroEnd + 1)
-        end
+        preProcessedContent = preProcessedContent:gsub(define, "\n")
     end
 
     table.sort(macros, function(a, b)
@@ -121,7 +119,7 @@ function HeaderScythe.scythe(content)
 
     for typedef in preProcessedContent:gmatch(MATCH_TYPEDEF) do
         local start = preProcessedContent:find(typedef, 0, true)
-        local line = findLineFromString(content, typedef)
+        local line = findLineFromString(preProcessedContent, typedef)
         table.insert(tokens, {
             token = TK_TYPEDEF,
             string = typedef,
@@ -132,7 +130,7 @@ function HeaderScythe.scythe(content)
 
     for const in preProcessedContent:gmatch(MATCH_CONST) do
         local start = preProcessedContent:find(const, 0, true)
-        local line = findLineFromString(content, const)
+        local line = findLineFromString(preProcessedContent, const)
         table.insert(tokens, {
             token = TK_CONST,
             string = const,
@@ -143,7 +141,7 @@ function HeaderScythe.scythe(content)
 
     for enum in preProcessedContent:gmatch(MATCH_ENUM) do
         local start = preProcessedContent:find(enum, 0, true)
-        local line = findLineFromString(content, enum)
+        local line = findLineFromString(preProcessedContent, enum)
         table.insert(tokens, {
             token = TK_ENUM,
             string = enum,
@@ -154,7 +152,7 @@ function HeaderScythe.scythe(content)
 
     for func in preProcessedContent:gmatch(MATCH_FUNC) do
         local start = preProcessedContent:find(func, 0, true)
-        local line = findLineFromString(content, func)
+        local line = findLineFromString(preProcessedContent, func)
         table.insert(tokens, {
             token = TK_FUNC,
             string = func,
@@ -165,7 +163,7 @@ function HeaderScythe.scythe(content)
 
     for struct in preProcessedContent:gmatch(MATCH_STRUCT) do
         local start = preProcessedContent:find(struct, 0, true)
-        local line = findLineFromString(content, struct)
+        local line = findLineFromString(preProcessedContent, struct)
         table.insert(tokens, {
             token = TK_STRUCT,
             string = struct,
@@ -176,7 +174,7 @@ function HeaderScythe.scythe(content)
 
     for union in preProcessedContent:gmatch(MATCH_UNION) do
         local start = preProcessedContent:find(union, 0, true)
-        local line = findLineFromString(content, union)
+        local line = findLineFromString(preProcessedContent, union)
         table.insert(tokens, {
             token = TK_STRUCT,
             string = union,
@@ -187,7 +185,7 @@ function HeaderScythe.scythe(content)
 
     for include in preProcessedContent:gmatch(MATCH_INCLUDE) do
         local start = preProcessedContent:find(include, 0, true)
-        local line = findLineFromString(content, include)
+        local line = findLineFromString(preProcessedContent, include)
         table.insert(tokens, {
             token = TK_INCLUDE,
             string = include,
