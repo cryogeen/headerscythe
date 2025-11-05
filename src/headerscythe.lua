@@ -33,7 +33,7 @@ local MATCH_MACRO_LABEL = "#define%s+([%w_]+)"
 local MATCH_MACRO_VALUE = "#define%s+[%w_]+[%s]*([%w_%*%\\%|]*)"
 
 local MATCH_TYPEDEF = "typedef%s*[%w_%*]+[%*%s]+[%w_%*%,%s]+;"
-local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w_%(%)%|%s%\\]+;"
+local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w_%(%)%|%s%\\%-]+;"
 local MATCH_ENUM = "typedef%s+enum%s+[%w_]*%s*%{[%w_%s%,]*%}%s*[%w_%, %*]+;"
 local MATCH_FUNC = "[%w_%*]+%s+[%w_]+%([%w_%*%,%s]*%);"
 local MATCH_STRUCT = "typedef%s+struct%s+[%w_]+%s*%{[%w_%*%;%s%{%}%[%]]+%}%s*[%w_%,%s%*]*;"
@@ -47,6 +47,14 @@ local TK_STRUCT = 0x10
 local TK_DEFINE = 0x20
 local TK_INCLUDE = 0x40
 
+-- Settings
+
+local GLOBAL_MACROS_ENABLED = true
+
+-- Variables
+
+local globalMacros = {}
+
 -- Functions
 
 ---@type fun(input: string, macros: {[1]: string, [2]: string, [3]: integer}[]): string
@@ -54,6 +62,14 @@ local function macroProcess(input, macros)
     for i, macro in next, macros do
         if input:find("[^%w_]+" .. macro[1] .. "[^%w_]+") then
             input = input:gsub(macro[1], macro[2])
+        end
+    end
+
+    if GLOBAL_MACROS_ENABLED then
+        for i, macro in next, globalMacros do
+            if input:find("[^%w_]+" .. macro[1] .. "[^%w_]+") then
+                input = input:gsub(macro[1], macro[2])
+            end
         end
     end
     return input
@@ -98,7 +114,7 @@ function HeaderScythe.scythe(content)
         local line = findLineFromString(preProcessedContent, define)
         local name = define:match(MATCH_MACRO_LABEL) or ""
         local value = define:match(MATCH_MACRO_VALUE) or ""
-        table.insert(macros, {name, value, start})
+        table.insert(macros, { name, value, start })
         table.insert(tokens, {
             token = TK_DEFINE,
             string = define,
@@ -112,6 +128,12 @@ function HeaderScythe.scythe(content)
     table.sort(macros, function(a, b)
         return a[3] < b[3]
     end)
+
+    if GLOBAL_MACROS_ENABLED then
+        for _, macro in next, macros do
+            table.insert(globalMacros, macro)
+        end
+    end
 
     preProcessedContent = macroProcess(preProcessedContent, macros)
 
