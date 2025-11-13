@@ -30,10 +30,10 @@ local MATCH_COMMENT_MULTILINE = "/%*[\32-\255]*%*/"
 local MATCH_INCLUDE = "#include%s+[%<%\"%\'][^%<%>%\"%\']+[%>%\"%\']"
 
 local MATCH_TYPEDEF = "typedef%s*[%w_%*]+[%*%s]+[%w_%*%,%s]+;"
-local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w_%(%)%|%s%\\%-]+;"
-local MATCH_ENUM = "typedef%s+enum%s+[%w_]*%s*%{[%w_%s%,]*%}%s*[%w_%, %*]+;"
-local MATCH_FUNC = "[%w_%*]+%s+[%w_]+%([%w_%*%,%s]*%);"
-local MATCH_STRUCT = "typedef%s+struct%s+[%w_]+%s*%{[%w_%*%;%s%{%}%[%]]+%}%s*[%w_%,%s%*]*;"
+local MATCH_CONST = "static%s+const%s*[%w_*]+%s+[%w_*]+%s*=%s*[%w_%p\n\32]+;"
+local MATCH_ENUM = "typedef%s+enum%s+[%w_]+%s*%b{}%s*[%*%w_%,\32\n]*;"
+local MATCH_FUNC = "[%w_%*]+%s+[%w_]+%b();"
+local MATCH_STRUCT = "typedef%s+struct%s+[%w_]*%s*%b{}[\32]*[%w_%,\32%*]*;"
 local MATCH_UNION = MATCH_STRUCT:gsub("struct", "union")
 
 local TK_TYPEDEF = 0x1
@@ -41,8 +41,7 @@ local TK_CONST = 0x2
 local TK_ENUM = 0x4
 local TK_FUNC = 0x8
 local TK_STRUCT = 0x10
-local TK_DEFINE = 0x20
-local TK_INCLUDE = 0x40
+local TK_INCLUDE = 0x20
 
 -- Functions
 
